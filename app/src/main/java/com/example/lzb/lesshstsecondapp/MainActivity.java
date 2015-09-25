@@ -260,7 +260,10 @@ public class MainActivity extends Activity {
             super.handleMessage(msg);
             Bundle data = msg.getData();
             String val = data.getString("value");
-            Log.i("mylog","请求结果为-->" + val);
+            Log.d("mylog", "请求结果为-->" + val);
+            TextView myLocationText;
+            myLocationText = (TextView) findViewById(R.id.cityString);
+            myLocationText.setText(val);
         }
     };
     Runnable runnable = new Runnable(){
@@ -272,6 +275,7 @@ public class MainActivity extends Activity {
 
             String weatherToShow = getWeather.getWeather(_addressCityName);
 
+            String latLongString = "";
             try{
                 jsonControl js = new jsonControl(weatherToShow);
 
@@ -280,17 +284,24 @@ public class MainActivity extends Activity {
                     Log.d(day.date, "date from baidu");
 
                 }
+
+                latLongString += js.dailyWeatherList.get(0).toString();
                 for(jsonControl.HourlyForcast hour : js.hourlyWeatherList){
                     System.out.println(hour.date);
                     Log.d(hour.date, "date from baidu");
                 }
+                latLongString += js.hourlyWeatherList.get(0).toString();
+
                 Log.d("tep is: " + js.nowWeather.tmp, "date from baidu");
+                latLongString += js.nowWeather.toString();
             }
             catch (JSONException e) {
                 return;
             }
-
-
+            Log.d(latLongString, "\ndate from baidu");
+//            TextView myLocationText;
+//            myLocationText = (TextView) findViewById(R.id.cityString);
+//            myLocationText.setText("天气:\n" + latLongString);
             String sinaString=GetHttp("http://php.weather.sina.com.cn/iframe/index/w_cl.php?code=js&day=0&city=&dfc=1");
             String jsonString= GetHttp("http://mobile.weather.com.cn/data/forecast/101010100.html");
             String XMLString= GetHttp("http://flash.weather.com.cn/wmaps/xml/china.xml");
@@ -309,7 +320,7 @@ public class MainActivity extends Activity {
 
             Message msg = new Message();
             Bundle data = new Bundle();
-            data.putString("value","请求结果");
+            data.putString("value",latLongString);
             msg.setData(data);
             handler.sendMessage(msg);
         }
